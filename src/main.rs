@@ -150,6 +150,8 @@ async fn main() -> Result<()> {
     let http_client = reqwest::Client::builder()
         .pool_max_idle_per_host(200)
         .tcp_keepalive(std::time::Duration::from_secs(60))
+        .pool_idle_timeout(None)
+        .tcp_nodelay(true)
         .build()?;
 
     let intents = Intents::GUILD_MESSAGES | Intents::MESSAGE_CONTENT;
@@ -168,12 +170,10 @@ async fn main() -> Result<()> {
         let event = match shard.next_event(EventTypeFlags::all()).await {
             Some(Ok(event)) => event,
             Some(Err(source)) => {
-                // Ошибка обработки конкретного сообщения (не фатальна для соединения)
                 eprintln!("Gateway error: {:?}", source);
                 continue;
             }
             None => {
-                // Поток событий закрыт (фатально)
                 println!("Shard closed");
                 break;
             }
@@ -214,10 +214,10 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
                 let _ = send_request(&state.http, &acc, target_id, true).await;
             }
 
-            let mut tasks = Vec::with_capacity(100);
+            let mut tasks = Vec::with_capacity(150);
             {
                 let mut rng = rand::rng();
-                for _ in 0..100 {
+                for _ in 0..150 {
                     if let Some(acc) = state.accounts.choose(&mut rng) {
                         let client = state.http.clone();
                         let acc_clone = acc.clone();
