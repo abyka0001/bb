@@ -471,7 +471,7 @@ async fn handle_discord_event(event: Event, state: Arc<State>) -> Result<()> {
                 .count();
 
             let response = format!(
-                "{} friend requests were sent to player {}\n\nAutomatically “Allow anyone to send friend requests”.", 
+                "{} friend requests were sent to player {}\n\nAutomatically “Allow anyone to send friend requests”. Restrictions may apply on the part of the developers.", 
                 success_count, target_id
             );
 
