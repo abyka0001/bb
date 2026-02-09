@@ -8,7 +8,7 @@ use reqwest::header::{HeaderMap, CONTENT_TYPE, USER_AGENT, ACCEPT_ENCODING, CONN
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::fs;
-use twilight_gateway::{Intents, Shard, ShardId, EventTypeFlags};
+use twilight_gateway::{Intents, Shard, ShardId, EventTypeFlags, StreamExt};
 use twilight_model::gateway::event::Event;
 use uuid::Uuid;
 
