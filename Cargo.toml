@@ -23,5 +23,5 @@ uuid = { version = "1", features = ["v4"] }
 md5 = "0.8"
 base64 = "0.22"
 aes = "0.8"
-cipher = "0.4"
+cipher = "0.5"
 anyhow = "1.0"
