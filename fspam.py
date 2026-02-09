@@ -175,7 +175,7 @@ def enc_token(token):
 
 async def main():
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=0)) as session:
-        with open("for_wars.txt") as f:
+        with open("noban.txt") as f:
             ACCOUNTS.extend(f.read().splitlines())
 
         asyncio.create_task(cdn(session))
