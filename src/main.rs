@@ -168,10 +168,15 @@ async fn main() -> Result<()> {
         let event = match shard.next_event(EventTypeFlags::all()).await {
             Some(Ok(event)) => event,
             Some(Err(source)) => {
-                if source.is_fatal() { break; }
+                // Ошибка обработки конкретного сообщения (не фатальна для соединения)
+                eprintln!("Gateway error: {:?}", source);
                 continue;
             }
-            None => break,
+            None => {
+                // Поток событий закрыт (фатально)
+                println!("Shard closed");
+                break;
+            }
         };
 
         let state_clone = state.clone();
