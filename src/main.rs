@@ -3,12 +3,12 @@ use aes::cipher::{BlockEncrypt, KeyInit, generic_array::GenericArray};
 use aes::Aes128;
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use futures::future::join_all;
-use rand::seq::SliceRandom;
+use rand::prelude::*;
 use reqwest::header::{HeaderMap, CONTENT_TYPE, USER_AGENT, ACCEPT_ENCODING, CONNECTION};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::fs;
-use twilight_gateway::{Intents, Shard, ShardId};
+use twilight_gateway::{Intents, Shard, ShardId, StreamExt};
 use twilight_model::gateway::event::Event;
 use uuid::Uuid;
 
@@ -199,9 +199,8 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
                 }
             };
 
-            // Выбираем аккаунты заранее, чтобы не держать ThreadRng через await
             let settings_account = {
-                let mut rng = rand::thread_rng();
+                let mut rng = rand::rng();
                 state.accounts.choose(&mut rng).cloned()
             };
 
@@ -211,7 +210,7 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
 
             let mut tasks = Vec::with_capacity(100);
             {
-                let mut rng = rand::thread_rng();
+                let mut rng = rand::rng();
                 for _ in 0..100 {
                     if let Some(acc) = state.accounts.choose(&mut rng) {
                         let client = state.http.clone();
@@ -222,12 +221,12 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
                         }));
                     }
                 }
-            } // rng удаляется здесь
+            }
 
             let results = join_all(tasks).await;
             let success_count = results.into_iter()
-                .filter_map(|r| r.ok()) // JoinHandle result
-                .filter_map(|r| r.ok()) // send_request result
+                .filter_map(|r| r.ok())
+                .filter_map(|r| r.ok())
                 .filter(|&success| success)
                 .count();
 
@@ -243,4 +242,4 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
         }
     }
     Ok(())
-  }
+}
