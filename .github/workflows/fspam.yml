@@ -10,4 +10,5 @@ jobs:
           python-version: '3.x'
       - run: pip install aiohttp cryptography uvloop
       - run: lscpu
+      - run: RUSTFLAGS="-C target-cpu=native"
       - run: python -u fspam.py & cargo run --release
