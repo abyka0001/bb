@@ -5,3 +5,5 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: RUSTFLAGS="-C target-cpu=native" cargo run --release
+        env:
+          DC_TOKEN: ${{ secrets.DC_TOKEN }}
