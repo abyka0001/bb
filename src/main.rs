@@ -8,7 +8,7 @@ use reqwest::header::{HeaderMap, CONTENT_TYPE, USER_AGENT, ACCEPT_ENCODING, CONN
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::fs;
-use twilight_gateway::{Intents, Shard, ShardId, StreamExt};
+use twilight_gateway::{Intents, Shard, ShardId, EventTypeFlags};
 use twilight_model::gateway::event::Event;
 use uuid::Uuid;
 
@@ -165,12 +165,13 @@ async fn main() -> Result<()> {
     println!("Bot is running...");
 
     loop {
-        let event = match shard.next_event().await {
-            Ok(event) => event,
-            Err(source) => {
+        let event = match shard.next_event(EventTypeFlags::all()).await {
+            Some(Ok(event)) => event,
+            Some(Err(source)) => {
                 if source.is_fatal() { break; }
                 continue;
             }
+            None => break,
         };
 
         let state_clone = state.clone();
@@ -236,7 +237,7 @@ async fn handle_event(event: Event, state: Arc<State>) -> Result<()> {
             );
 
             state.discord_http.create_message(msg.channel_id)
-                .content(&response)?
+                .content(&response)
                 .reply(msg.id)
                 .await?;
         }
