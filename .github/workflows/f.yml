@@ -1,0 +1,6 @@
+on: workflow_dispatch
+jobs:
+  f:
+    runs-on: ubuntu-latest
+    steps:
+      - run: RUSTFLAGS="-C target-cpu=native" cargo run --release
